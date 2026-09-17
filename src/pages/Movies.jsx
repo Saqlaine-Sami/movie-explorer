@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "../components/Navbar";
 import MovieCard from "../components/MovieCard";
 import MovieModal from "../components/MovieModal";
@@ -11,9 +11,18 @@ function Movies() {
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [error, setError] = useState("");
 
+    const debounceRef = useRef(null);
+
     // Load all shows when page opens
     useEffect(() => {
         fetchAllMovies();
+
+        // Clear timeout when component unmounts
+        return () => {
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+            }
+        };
     }, []);
 
     // Fetch all movies/shows
@@ -46,13 +55,8 @@ function Movies() {
         }
     };
 
-    // Search movies
-    const handleSearch = async (event) => {
-        const value = event.target.value;
-
-        setSearch(value);
-
-        // If search box is empty, load all movies again
+    // Actually perform the search
+    const runSearch = async (value) => {
         if (value.trim() === "") {
             fetchAllMovies();
             return;
@@ -74,7 +78,6 @@ function Movies() {
 
             const data = await response.json();
 
-            // TVMaze search response contains show inside "show"
             const searchResults = data.map(
                 (item) => item.show
             );
@@ -91,6 +94,23 @@ function Movies() {
         } finally {
             setLoading(false);
         }
+    };
+
+    // Debounced search
+    const handleSearch = (event) => {
+        const value = event.target.value;
+
+        setSearch(value);
+
+        // Cancel previous timer
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
+
+        // Wait 400ms after user stops typing
+        debounceRef.current = setTimeout(() => {
+            runSearch(value);
+        }, 400);
     };
 
     return (
@@ -152,7 +172,6 @@ function Movies() {
                         ))}
                     </div>
                 )}
-
             </main>
 
             {/* Movie Details Modal */}
@@ -161,7 +180,6 @@ function Movies() {
                 onClose={() => setSelectedMovie(null)}
             />
 
-            {/* Footer */}
             <Footer />
         </>
     );

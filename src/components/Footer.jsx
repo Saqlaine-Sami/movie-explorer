@@ -11,7 +11,7 @@ function Footer() {
                 </div>
 
                 <div className="footer-links">
-                    <a href="https://github.com" target="_blank">
+                    <a href="https://github.com/Saqlaine-Sami" target="_blank">
                         GitHub
                     </a>
 
