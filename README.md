@@ -4,8 +4,7 @@ A responsive movie and TV show discovery application built with React and the TV
 
 ## 🚀 Live Demo
 
-Add your Vercel deployment link here.
-
+https://movie-explorer-lac-psi.vercel.app/movies
 ## 📌 Features
 
 - Browse movies and TV shows
